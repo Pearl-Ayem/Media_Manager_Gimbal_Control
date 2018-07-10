@@ -1,3 +1,17 @@
+package com.dji.FPVDemo;
+
+import android.app.Activity;
+import android.graphics.SurfaceTexture;
+import android.os.Bundle;
+import android.view.TextureView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import com.dji.FPVDemo.R;
+
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener, View.OnClickListener {
     protected TextureView mVideoSurface = null;
     private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
