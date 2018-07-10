@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FPVDemo</string>
+    <string name="title_activity_connection">ConnectionActivity</string>
 </resources>
