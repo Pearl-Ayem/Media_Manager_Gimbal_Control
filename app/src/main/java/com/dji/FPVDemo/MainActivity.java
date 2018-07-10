@@ -17,6 +17,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
     private ToggleButton mRecordBtn;
     private TextView recordingTime;
+    private static BaseProduct mProduct;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
