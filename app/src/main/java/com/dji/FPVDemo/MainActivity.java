@@ -1,14 +1,11 @@
 package com.dji.FPVDemo;
 
+
+import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.TextureView.SurfaceTextureListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -29,7 +26,6 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.useraccount.UserAccountManager;
 
-//import static dji.midware.media.DJIVideoDecoder.R;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener, View.OnClickListener {
     protected TextureView mVideoSurface = null;
