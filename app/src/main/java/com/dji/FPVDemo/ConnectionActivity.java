@@ -10,6 +10,7 @@ import dji.sdk.sdkmanager.DJISDKManager;
 
 
 
+
 public class ConnectionActivity extends Activity implements View.OnClickListener {
     private static final String TAG = ConnectionActivity.class.getName();
     private TextView mTextConnectionStatus;
