@@ -1,13 +1,15 @@
 package com.dji.FPVDemo;
 
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.TextureView.SurfaceTextureListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -18,11 +20,13 @@ import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
+import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
+import dji.sdk.useraccount.UserAccountManager;
 
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener, View.OnClickListener {
@@ -46,7 +50,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         initUI();
 
         //The callback for receiving the raw H264 video data for camera live view
-        MReceivedVideoDataCallback = new VideoFeeder.VideoDataCallback() {
+        mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
             @Override
             public void onReceive(byte[] videoBuffer, int size) {
                 if (mCodecManager != null) {
@@ -96,6 +100,23 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
     protected void onProductChange() {
         initPreviewer();
+        loginAccount();
+    }
+
+    private void loginAccount(){
+
+        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
+                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
+                    @Override
+                    public void onSuccess(final UserAccountState userAccountState) {
+                        Log.e(TAG, "Login Success");
+                    }
+                    @Override
+                    public void onFailure(DJIError error) {
+                        showToast("Login Error:"
+                                + error.getDescription());
+                    }
+                });
     }
 
     @Override
@@ -111,20 +132,25 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
     @Override
     public void onPause() {
+        Log.e(TAG, "onStop");
         super.onPause();
     }
 
     @Override
     public void onStop() {
+        Log.e(TAG, "onStop");
         super.onStop();
     }
 
-    public void onReturn(View view) {
+    public void onReturn(View view){
+        Log.e(TAG, "onReturn");
         this.finish();
     }
 
     @Override
     protected void onDestroy() {
+        Log.e(TAG, "onDestroy");
+        uninitPreviewer();
         super.onDestroy();
     }
 
@@ -158,6 +184,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     private void initUI() {
         // init mVideoSurface
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
+
         recordingTime = (TextView) findViewById(R.id.timer);
         mCaptureBtn = (Button) findViewById(R.id.btn_capture);
         mRecordBtn = (ToggleButton) findViewById(R.id.btn_record);
@@ -172,13 +199,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         mRecordBtn.setOnClickListener(this);
         mShootPhotoModeBtn.setOnClickListener(this);
         mRecordVideoModeBtn.setOnClickListener(this);
-        recordingTime.setVisibility(View.INVISIBLE);
-        mRecordBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-            }
-        });
+        recordingTime.setVisibility(View.INVISIBLE);
 
         mRecordBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -192,6 +214,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 }
             }
         });
+
+
     }
 
     // Method for starting recording
@@ -278,6 +302,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             }
         }
     }
+
 
     private void showToast(final String toastMsg) {
         runOnUiThread(new Runnable() {
