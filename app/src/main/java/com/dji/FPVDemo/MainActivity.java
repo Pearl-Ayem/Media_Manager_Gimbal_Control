@@ -3,22 +3,39 @@ package com.dji.FPVDemo;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.TextureView.SurfaceTextureListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+import dji.sdk.sdkmanager.DJISDKManager;
 
-import com.dji.FPVDemo.R;
+
+import dji.common.camera.SettingsDefinitions;
+import dji.common.camera.SystemState;
+import dji.common.error.DJIError;
+import dji.common.product.Model;
+import dji.common.useraccount.UserAccountState;
+import dji.common.util.CommonCallbacks;
+import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
+import dji.sdk.camera.VideoFeeder;
+import dji.sdk.codec.DJICodecManager;
+import dji.sdk.useraccount.UserAccountManager;
+
+//import static dji.midware.media.DJIVideoDecoder.R;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener, View.OnClickListener {
     protected TextureView mVideoSurface = null;
     private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
     private ToggleButton mRecordBtn;
     private TextView recordingTime;
-    private static BaseProduct mProduct;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
