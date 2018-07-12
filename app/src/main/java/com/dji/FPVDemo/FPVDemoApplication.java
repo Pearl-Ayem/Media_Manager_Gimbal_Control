@@ -139,7 +139,7 @@ public class FPVDemoApplication extends Application{
                 }
                 Log.e("TAG", error.toString());
             }
-
+// reads spark
             //Listens to the connected product changing, including two parts, component changing or product connection changing.
             @Override
             public void onProductChange(BaseProduct oldProduct, BaseProduct newProduct) {
