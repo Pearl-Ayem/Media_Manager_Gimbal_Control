@@ -49,25 +49,16 @@
         android:id="@+id/textView2" />
 
     <TextView
-        ontal="true"
-        andro
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="DJIFPVDemo"
         android:id="@+id/textView"
-
-        ayout_width="wrap_content"
-        a
-        @color/colorBlack"
-        android:t
-        20sp"
+        android:layout_marginTop="58dp"
         android:textStyle="bold"
-        _marginTop="58dp"
-        andro
-        rue"
-        "@string/djifpvdemo"
-        yout_height="wrap_content"
-        android:layout_alignPar
-        xtAppearanceSmall"
-        android:te
-        textAppearance="?androi
-        @string/djifpvd"
-        />
+        android:textSize="20dp"
+        android:textColor="@color/colorBlack"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

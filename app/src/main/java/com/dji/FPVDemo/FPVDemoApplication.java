@@ -77,8 +77,6 @@ public class FPVDemoApplication extends Application{
         super.onCreate();
         mHandler = new Handler(Looper.getMainLooper());
 
-        //This is used to start SDK services and initiate SDK
-//        DJISDKManager.getInstance().initSDKManager(this,mDJISDKManagerCallback);
 
         mDJIComponentListener = new BaseComponent.ComponentListener() {
 
