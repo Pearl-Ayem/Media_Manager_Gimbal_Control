@@ -28,29 +28,34 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.useraccount.UserAccountManager;
 
+public class MainActivity extends Activity implements SurfaceTextureListener,OnClickListener{
 
-public class MainActivity extends Activity implements TextureView.SurfaceTextureListener, View.OnClickListener {
+    private static final String TAG = MainActivity.class.getName();
+    protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
+
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
+
     protected TextureView mVideoSurface = null;
     private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
     private ToggleButton mRecordBtn;
     private TextView recordingTime;
-    private Handler handler;
 
-    private static final String TAG = MainActivity.class.getName();
-    protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         handler = new Handler();
+
         initUI();
 
-        //The callback for receiving the raw H264 video data for camera live view
+        // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
+
             @Override
             public void onReceive(byte[] videoBuffer, int size) {
                 if (mCodecManager != null) {
@@ -58,6 +63,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 }
             }
         };
+
         Camera camera = FPVDemoApplication.getCameraInstance();
 
         if (camera != null) {
@@ -84,9 +90,10 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                                 /*
                                  * Update recordingTime TextView visibility and mRecordBtn's check state
                                  */
-                                if (isVideoRecording) {
+                                if (isVideoRecording){
                                     recordingTime.setVisibility(View.VISIBLE);
-                                } else {
+                                }else
+                                {
                                     recordingTime.setVisibility(View.INVISIBLE);
                                 }
                             }
@@ -96,6 +103,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             });
 
         }
+
     }
 
     protected void onProductChange() {
@@ -125,14 +133,16 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         super.onResume();
         initPreviewer();
         onProductChange();
-        if (mVideoSurface == null) {
+
+        if(mVideoSurface == null) {
             Log.e(TAG, "mVideoSurface is null");
         }
     }
 
     @Override
     public void onPause() {
-        Log.e(TAG, "onStop");
+        Log.e(TAG, "onPause");
+        uninitPreviewer();
         super.onPause();
     }
 
@@ -154,36 +164,9 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         super.onDestroy();
     }
 
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.e(TAG, "onSurfaceTextureAvailable");
-        if (mCodecManager == null) {
-            mCodecManager = new DJICodecManager(this, surface, width, height);
-        }
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        Log.e(TAG, "onSurfaceTextureSizeChanged");
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG, "onSurfaceTextureDestroyed");
-        if (mCodecManager != null) {
-            mCodecManager.cleanSurface();
-            mCodecManager = null;
-        }
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-    }
-
     private void initUI() {
         // init mVideoSurface
-        mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
+        mVideoSurface = (TextureView)findViewById(R.id.video_previewer_surface);
 
         recordingTime = (TextView) findViewById(R.id.timer);
         mCaptureBtn = (Button) findViewById(R.id.btn_capture);
@@ -206,91 +189,18 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    recordingTime.setVisibility(View.VISIBLE);
                     startRecord();
                 } else {
-                    recordingTime.setVisibility(View.INVISIBLE);
                     stopRecord();
                 }
             }
         });
-
-
     }
-
-    // Method for starting recording
-    private void startRecord() {
-        final Camera camera = FPVDemoApplication.getCameraInstance();
-        if (camera != null) {
-            camera.startRecordVideo(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError == null) {
-                        showToast("Record video: success");
-                    } else {
-                        showToast(djiError.getDescription());
-                    }
-                }
-            }); // Execute the startRecordVideo API
-        }
-    }
-
-    // Method for stopping recording
-    private void stopRecord() {
-        Camera camera = FPVDemoApplication.getCameraInstance();
-        if (camera != null) {
-            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError == null) {
-                        showToast("Stop recording: success");
-                    } else {
-                        showToast(djiError.getDescription());
-                    }
-                }
-            }); // Execute the stopRecordVideo API
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_capture: {
-                captureAction();
-                break;
-            }
-            case R.id.btn_shoot_photo_mode: {
-                switchCameraMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO);
-                break;
-            }
-            case R.id.btn_record_video_mode: {
-                switchCameraMode(SettingsDefinitions.CameraMode.RECORD_VIDEO);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode) {
-        Camera camera = FPVDemoApplication.getCameraInstance();
-        if (camera != null) {
-            camera.setMode(cameraMode, new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError error) {
-                    if (error == null) {
-                        showToast("Switch Camera Mode Succeeded");
-                    } else {
-                        showToast(error.getDescription());
-                    }
-                }
-            });
-        }
-    }
-
 
     private void initPreviewer() {
+
         BaseProduct product = FPVDemoApplication.getProductInstance();
+
         if (product == null || !product.isConnected()) {
             showToast(getString(R.string.disconnected));
         } else {
@@ -303,30 +213,97 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         }
     }
 
-
-    private void showToast(final String toastMsg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), toastMsg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
     private void uninitPreviewer() {
         Camera camera = FPVDemoApplication.getCameraInstance();
-        if (camera != null) {
+        if (camera != null){
             // Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
         }
     }
 
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureAvailable");
+        if (mCodecManager == null) {
+            mCodecManager = new DJICodecManager(this, surface, width, height);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureSizeChanged");
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.e(TAG,"onSurfaceTextureDestroyed");
+        if (mCodecManager != null) {
+            mCodecManager.cleanSurface();
+            mCodecManager = null;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
+
+    public void showToast(final String msg) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.btn_capture:{
+                captureAction();
+                break;
+            }
+            case R.id.btn_shoot_photo_mode:{
+                switchCameraMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO);
+                break;
+            }
+            case R.id.btn_record_video_mode:{
+                switchCameraMode(SettingsDefinitions.CameraMode.RECORD_VIDEO);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode){
+
+        Camera camera = FPVDemoApplication.getCameraInstance();
+        if (camera != null) {
+            camera.setMode(cameraMode, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError error) {
+
+                    if (error == null) {
+                        showToast("Switch Camera Mode Succeeded");
+                    } else {
+                        showToast(error.getDescription());
+                    }
+                }
+            });
+        }
+    }
+
     // Method for taking photo
-    private void captureAction() {
+    private void captureAction(){
+
         final Camera camera = FPVDemoApplication.getCameraInstance();
         if (camera != null) {
+
             SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
-            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback() {
+            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
                 @Override
                 public void onResult(DJIError djiError) {
                     if (null == djiError) {
@@ -351,4 +328,43 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         }
     }
 
+    // Method for starting recording
+    private void startRecord(){
+
+        final Camera camera = FPVDemoApplication.getCameraInstance();
+        if (camera != null) {
+            camera.startRecordVideo(new CommonCallbacks.CompletionCallback(){
+                @Override
+                public void onResult(DJIError djiError)
+                {
+                    if (djiError == null) {
+                        showToast("Record video: success");
+                    }else {
+                        showToast(djiError.getDescription());
+                    }
+                }
+            }); // Execute the startRecordVideo API
+        }
+    }
+
+    // Method for stopping recording
+    private void stopRecord(){
+
+        Camera camera = FPVDemoApplication.getCameraInstance();
+        if (camera != null) {
+            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback(){
+
+                @Override
+                public void onResult(DJIError djiError)
+                {
+                    if(djiError == null) {
+                        showToast("Stop recording: success");
+                    }else {
+                        showToast(djiError.getDescription());
+                    }
+                }
+            }); // Execute the stopRecordVideo API
+        }
+
+    }
 }

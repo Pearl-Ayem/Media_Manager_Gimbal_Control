@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dji.FPVDemo">
 
+    <!-- DJI SDK need permission -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -27,34 +28,38 @@
         android:name="android.hardware.usb.accessory"
         android:required="true" />
 
+    <!-- SDK requirement permission end -->
+
     <application
         android:name=".MApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <!-- DJI SDK -->
         <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data
             android:name="com.dji.sdk.API_KEY"
             android:value="a1ce08b884d4ffb204e83e5a" />
+
         <activity
             android:name="dji.sdk.sdkmanager.DJIAoaControllerActivity"
-            android:theme="@android:style/Theme.Translucent">
+            android:theme="@android:style/Theme.Translucent" >
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
+
             <meta-data
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
         </activity>
-        <service android:name="dji.sdk.sdkmanager.DJIGlobalService"></service>
+        <service android:name="dji.sdk.sdkmanager.DJIGlobalService" >
+        </service>
         <!-- DJI SDK -->
 
-        <activity
-            android:name=".ConnectionActivity"
+        <activity android:name=".ConnectionActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
 
@@ -63,9 +68,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".MainActivity"
+        <activity android:name=".MainActivity"
             android:screenOrientation="landscape"></activity>
     </application>
+
 </manifest>
