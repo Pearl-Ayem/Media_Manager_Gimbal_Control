@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FPVDemo.iml" filepath="$PROJECT_DIR$/FPVDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FPV Camera and maps.iml" filepath="$PROJECT_DIR$/FPV Camera and maps.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
