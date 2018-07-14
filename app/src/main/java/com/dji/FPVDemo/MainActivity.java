@@ -3,8 +3,11 @@ package com.dji.FPVDemo;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -15,6 +18,13 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
@@ -28,7 +38,7 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.useraccount.UserAccountManager;
 
-public class MainActivity extends Activity implements SurfaceTextureListener,OnClickListener{
+public class MainActivity extends Activity implements SurfaceTextureListener, View.OnClickListener{
 
     private static final String TAG = MainActivity.class.getName();
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
@@ -37,6 +47,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     protected DJICodecManager mCodecManager = null;
 
     protected TextureView mVideoSurface = null;
+    private GoogleMap gMap;
     private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
     private ToggleButton mRecordBtn;
     private TextView recordingTime;
@@ -45,12 +56,24 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.VIBRATE,
+//                            Manifest.permission.INTERNET, Manifest.permission.ACCESS_WIFI_STATE,
+//                            Manifest.permission.WAKE_LOCK, Manifest.permission.ACCESS_COARSE_LOCATION,
+//                            Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_FINE_LOCATION,
+//                            Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
+//                            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.SYSTEM_ALERT_WINDOW,
+//                            Manifest.permission.READ_PHONE_STATE,
+//                    }
+//                    , 1);
+//        }
+
+
         setContentView(R.layout.activity_main);
-
         handler = new Handler();
-
         initUI();
 
         // The callback for receiving the raw H264 video data for camera live view
@@ -90,10 +113,9 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
                                 /*
                                  * Update recordingTime TextView visibility and mRecordBtn's check state
                                  */
-                                if (isVideoRecording){
+                                if (isVideoRecording) {
                                     recordingTime.setVisibility(View.VISIBLE);
-                                }else
-                                {
+                                } else {
                                     recordingTime.setVisibility(View.INVISIBLE);
                                 }
                             }
@@ -111,7 +133,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         loginAccount();
     }
 
-    private void loginAccount(){
+    private void loginAccount() {
 
         UserAccountManager.getInstance().logIntoDJIUserAccount(this,
                 new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
@@ -119,6 +141,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
                     public void onSuccess(final UserAccountState userAccountState) {
                         Log.e(TAG, "Login Success");
                     }
+
                     @Override
                     public void onFailure(DJIError error) {
                         showToast("Login Error:"
@@ -134,7 +157,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         initPreviewer();
         onProductChange();
 
-        if(mVideoSurface == null) {
+        if (mVideoSurface == null) {
             Log.e(TAG, "mVideoSurface is null");
         }
     }
@@ -152,7 +175,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         super.onStop();
     }
 
-    public void onReturn(View view){
+    public void onReturn(View view) {
         Log.e(TAG, "onReturn");
         this.finish();
     }
@@ -166,7 +189,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     private void initUI() {
         // init mVideoSurface
-        mVideoSurface = (TextureView)findViewById(R.id.video_previewer_surface);
+        mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
 
         recordingTime = (TextView) findViewById(R.id.timer);
         mCaptureBtn = (Button) findViewById(R.id.btn_capture);
@@ -215,7 +238,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     private void uninitPreviewer() {
         Camera camera = FPVDemoApplication.getCameraInstance();
-        if (camera != null){
+        if (camera != null) {
             // Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
         }
@@ -236,7 +259,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG,"onSurfaceTextureDestroyed");
+        Log.e(TAG, "onSurfaceTextureDestroyed");
         if (mCodecManager != null) {
             mCodecManager.cleanSurface();
             mCodecManager = null;
@@ -261,15 +284,15 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.btn_capture:{
+            case R.id.btn_capture: {
                 captureAction();
                 break;
             }
-            case R.id.btn_shoot_photo_mode:{
+            case R.id.btn_shoot_photo_mode: {
                 switchCameraMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO);
                 break;
             }
-            case R.id.btn_record_video_mode:{
+            case R.id.btn_record_video_mode: {
                 switchCameraMode(SettingsDefinitions.CameraMode.RECORD_VIDEO);
                 break;
             }
@@ -278,7 +301,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         }
     }
 
-    private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode){
+    private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode) {
 
         Camera camera = FPVDemoApplication.getCameraInstance();
         if (camera != null) {
@@ -297,13 +320,13 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     }
 
     // Method for taking photo
-    private void captureAction(){
+    private void captureAction() {
 
         final Camera camera = FPVDemoApplication.getCameraInstance();
         if (camera != null) {
 
             SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
-            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
+            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback() {
                 @Override
                 public void onResult(DJIError djiError) {
                     if (null == djiError) {
@@ -329,17 +352,16 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     }
 
     // Method for starting recording
-    private void startRecord(){
+    private void startRecord() {
 
         final Camera camera = FPVDemoApplication.getCameraInstance();
         if (camera != null) {
-            camera.startRecordVideo(new CommonCallbacks.CompletionCallback(){
+            camera.startRecordVideo(new CommonCallbacks.CompletionCallback() {
                 @Override
-                public void onResult(DJIError djiError)
-                {
+                public void onResult(DJIError djiError) {
                     if (djiError == null) {
                         showToast("Record video: success");
-                    }else {
+                    } else {
                         showToast(djiError.getDescription());
                     }
                 }
@@ -348,18 +370,17 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     }
 
     // Method for stopping recording
-    private void stopRecord(){
+    private void stopRecord() {
 
         Camera camera = FPVDemoApplication.getCameraInstance();
         if (camera != null) {
-            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback(){
+            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback() {
 
                 @Override
-                public void onResult(DJIError djiError)
-                {
-                    if(djiError == null) {
+                public void onResult(DJIError djiError) {
+                    if (djiError == null) {
                         showToast("Stop recording: success");
-                    }else {
+                    } else {
                         showToast(djiError.getDescription());
                     }
                 }
@@ -367,4 +388,5 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         }
 
     }
+
 }
