@@ -2,6 +2,7 @@ package com.dji.FPVDemo;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,8 +48,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     protected DJICodecManager mCodecManager = null;
 
     protected TextureView mVideoSurface = null;
-    private GoogleMap gMap;
-    private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
+    private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn, mapBtn;
     private ToggleButton mRecordBtn;
     private TextView recordingTime;
 
@@ -190,7 +190,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     private void initUI() {
         // init mVideoSurface
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
-
+        mapBtn = (Button) findViewById(R.id.btn_maps);
         recordingTime = (TextView) findViewById(R.id.timer);
         mCaptureBtn = (Button) findViewById(R.id.btn_capture);
         mRecordBtn = (ToggleButton) findViewById(R.id.btn_record);
@@ -205,6 +205,13 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
         mRecordBtn.setOnClickListener(this);
         mShootPhotoModeBtn.setOnClickListener(this);
         mRecordVideoModeBtn.setOnClickListener(this);
+        mapBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toy = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(toy);
+            }
+        });
 
         recordingTime.setVisibility(View.INVISIBLE);
 
