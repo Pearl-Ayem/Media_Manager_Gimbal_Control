@@ -28,34 +28,15 @@ import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapActivity";
-
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
+    private static final float DEFAULT_ZOOM = 15;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-
-        getLocationPermission();
-    }
-
-    // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-    private void initMap() {
-        Log.d(TAG, "initMap: initializing map");
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-
 
     /**
      * Manipulates the map once available.
@@ -76,6 +57,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng UAV = new LatLng(49.238074, -122.853361);
         mMap.addMarker(new MarkerOptions().position(UAV).title("Marker in UAViation Aerial Solutions"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(UAV));
+
+        if (mLocationPermissionsGranted) {
+            getDeviceLocation();
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
+                    (this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        getLocationPermission();
+    }
+
+    // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+    private void initMap() {
+        Log.d(TAG, "initMap: initializing map");
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
 
@@ -132,12 +143,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         try {
             if (mLocationPermissionsGranted) {
-                Task location = mFusedLocationProviderClient.getLastLocation();
+                final Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "onComplete: found location!");
+                            Location currentLocation = (Location) task.getResult();
+                            moveCamera(new LatLng((currentLocation.getLatitude()), currentLocation.getLatitude()), DEFAULT_ZOOM);
                         } else {
                             Log.d(TAG, "onComplete : current location is null");
                             Toast.makeText(MapsActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -148,6 +161,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (SecurityException e) {
             Log.e(TAG, "getDeviceLocation: Security Exception thrown: " + e.getMessage());
         }
+    }
+
+    private void moveCamera(LatLng latlon, float zoom) {
+        Log.d(TAG, "moveCamera: moving the camera to-> lon: " + latlon.latitude + ", lng:" + latlon.longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlon, zoom));
     }
 
 
