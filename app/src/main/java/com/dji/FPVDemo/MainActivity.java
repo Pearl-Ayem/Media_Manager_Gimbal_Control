@@ -43,7 +43,7 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.useraccount.UserAccountManager;
 
-public class MainActivity extends AppCompatActivity implements SurfaceTextureListener, View.OnClickListener{
+public class MainActivity extends Activity implements SurfaceTextureListener, View.OnClickListener{
 
     private static final String TAG = MainActivity.class.getName();
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -79,10 +79,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
 
         setContentView(R.layout.activity_main);
         handler = new Handler();
+        initUI();
 
-        if (isServicesOK()){
-            initUI();
-        }
+//        if (isServicesOK()){
+//            initUI();
+//        }
 
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
@@ -136,26 +137,26 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
 
     }
 
-    public boolean isServicesOK(){
-        Log.d(TAG, "isServicesOK: checking google services version");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
-
-        if(available == ConnectionResult.SUCCESS){
-            //everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK: Google Play Services is working");
-            return true;
-        }
-        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            //an error occured but we can resolve it
-            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }else{
-            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
+//    public boolean isServicesOK(){
+//        Log.d(TAG, "isServicesOK: checking google services version");
+//
+//        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+//
+//        if(available == ConnectionResult.SUCCESS){
+//            //everything is fine and the user can make map requests
+//            Log.d(TAG, "isServicesOK: Google Play Services is working");
+//            return true;
+//        }
+//        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+//            //an error occured but we can resolve it
+//            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+//            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+//            dialog.show();
+//        }else{
+//            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
+//        }
+//        return false;
+//    }
 
     protected void onProductChange() {
         initPreviewer();
