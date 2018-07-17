@@ -160,25 +160,25 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
 
     protected void onProductChange() {
         initPreviewer();
-        loginAccount();
+//        loginAccount();
     }
 
-    private void loginAccount() {
-
-        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
-                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
-                    @Override
-                    public void onSuccess(final UserAccountState userAccountState) {
-                        Log.e(TAG, "Login Success");
-                    }
-
-                    @Override
-                    public void onFailure(DJIError error) {
-                        showToast("Login Error:"
-                                + error.getDescription());
-                    }
-                });
-    }
+//    private void loginAccount() {
+//
+//        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
+//                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
+//                    @Override
+//                    public void onSuccess(final UserAccountState userAccountState) {
+//                        Log.e(TAG, "Login Success");
+//                    }
+//
+//                    @Override
+//                    public void onFailure(DJIError error) {
+//                        showToast("Login Error:"
+//                                + error.getDescription());
+//                    }
+//                });
+//    }
 
     @Override
     public void onResume() {
