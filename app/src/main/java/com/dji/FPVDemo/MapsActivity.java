@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -56,48 +57,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void init(){
-        Log.d(TAG, "init: initializing");
-
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
-
-                    //execute our method for searching
-                    geoLocate();
-                }
-
-                return false;
-            }
-        });
-    }
-
-    private void geoLocate(){
-        Log.d(TAG, "geoLocate: geolocating");
-
-        String searchString = mSearchText.getText().toString();
-
-        Geocoder geocoder = new Geocoder(MapsActivity.this);
-        List<Address> list = new ArrayList<>();
-        try{
-            list = geocoder.getFromLocationName(searchString, 5);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
-        }
-    }
-
 
     /**
      * Manipulates the map once available.
@@ -111,27 +70,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in UAViation and move the camera
         LatLng UAV = new LatLng(49.238074, -122.853361);
         mMap.addMarker(new MarkerOptions().position(UAV).title("Marker in UAViation Aerial Solutions"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(UAV));
-        getDeviceLocation();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
+
+
+
+//        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+//                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            getDeviceLocation();
+//            mMap.setMyLocationEnabled(true);
+//            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+//            mMap.getUiSettings().setCompassEnabled(true);
+//            mMap.getUiSettings().setRotateGesturesEnabled(true);
+//            init();
+//        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+        getDeviceLocation();
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setRotateGesturesEnabled(true);
+        init();
+
     }
+
+
+    private void init() {
+        Log.d(TAG, "init: initializing");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+
+                    //execute our method for searching
+                    geoLocate();
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void geoLocate() {
+        Log.d(TAG, "geoLocate: geolocating");
+
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(MapsActivity.this);
+        List<Address> list = new ArrayList<>();
+        try {
+            list = geocoder.getFromLocationName(searchString, 5);
+        } catch (IOException e) {
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage());
+        }
+
+        if (list.size() > 0) {
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
 
     private void getDeviceLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
@@ -167,8 +181,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+    private void moveCamera(LatLng latLng, float zoom) {
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 }

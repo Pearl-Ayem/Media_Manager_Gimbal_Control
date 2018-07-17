@@ -37,10 +37,14 @@
             android:layout_centerVertical="true"
             android:textSize="15sp"
             android:textColor="#000"
+            android:inputType="text"
+            android:maxLines="1"
             android:id="@+id/input_search"
             android:background="@null"
-            android:hint="  Enter Address, City or Zip Code"
-            android:imeOptions="actionSearch"/>
+            android:hint="Enter Address, City or Zip Code"
+            android:imeOptions="actionSearch"
+            />
+
 
 
     </RelativeLayout>
