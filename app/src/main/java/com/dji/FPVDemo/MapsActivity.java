@@ -103,7 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-//does this work?
+// test: which repo does this update?
     private void init() {
         Log.d(TAG, "init: initializing");
 
