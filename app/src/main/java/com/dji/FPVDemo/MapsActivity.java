@@ -8,14 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-
 import android.location.Location;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -23,18 +19,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.maps.android.SphericalUtil;
+
+import static com.google.maps.android.SphericalUtil.computeHeading;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -43,12 +46,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = "MapActivity";
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private EditText mSearchText;
+    private EditText mHeadingOrigin;
+    private EditText mHeadingDest;
+    private TextView mHeading;
+    private Marker mOriginMarker;
+    private Marker mDestMarker;
+    private Polyline mPolyline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mSearchText = (EditText) findViewById(R.id.input_search);
+        mHeadingOrigin = (EditText) findViewById(R.id.origin);
+        mHeadingDest = (EditText) findViewById(R.id.dest);
+        mHeading = (TextView) findViewById(R.id.heading);
 
         Log.d(TAG, "initMap: initializing map");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -94,7 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         getDeviceLocation();
-        mMap.setPadding(0,200,0,0);
+        mMap.setPadding(0, 200, 0, 0);
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
@@ -103,7 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-// test: which repo does this update?
+    // test: which repo does this update?
     private void init() {
         Log.d(TAG, "init: initializing");
 
@@ -114,7 +126,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         || actionId == EditorInfo.IME_ACTION_DONE
                         || keyEvent.getAction() == KeyEvent.ACTION_DOWN
                         || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-
                     //execute our method for searching
                     geoLocate();
                 }
@@ -123,8 +134,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        hideSoftKeyboard();
+        mHeadingOrigin.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_NULL
+                        || i == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    //execute our method for searching
+                    showHeading(textView);
+                }
+                return false;
+            }
+        });
+
+        mHeadingDest.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_NULL
+                        || i == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    //execute our method for searching
+                    showHeading(textView);
+                }
+                return false;
+            }
+        });
+
+
     }
+
 
     private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
@@ -196,9 +236,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         hideSoftKeyboard();
     }
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
+
+    private double getHeading(String origin, String dest) {
+        return computeHeading(convertoLatLon(origin), convertoLatLon(dest));
+    }
+
+    private void showHeading(View v) {
+        try {
+            String org = mHeadingOrigin.getText().toString();
+            String desti = mHeadingDest.getText().toString();
+            mHeading.setText(" Heading: " + getHeading(org, desti));
+        } catch (NumberFormatException e){
+            //do nothing
+        }
+    }
+
+    private LatLng convertoLatLon(String input) {
+        String[] latlonString = input.split(",");
+        double lat = Double.parseDouble(latlonString[0]);
+        double lon = Double.parseDouble(latlonString[1]);
+        LatLng latlon = new LatLng(lat, lon);
+        return latlon;
+    }
+
 
 }
 
