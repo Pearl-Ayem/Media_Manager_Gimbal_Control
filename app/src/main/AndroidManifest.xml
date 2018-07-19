@@ -67,25 +67,16 @@
         <service android:name="dji.sdk.sdkmanager.DJIGlobalService" />
         <!-- DJI SDK -->
 
-        <activity
-            android:name=".ConnectionActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            android:screenOrientation="landscape">
+            <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
         <activity
             android:name=".MapsActivity"
             android:configChanges="orientation|screenSize"
