@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FPV Camera and maps.iml" filepath="$PROJECT_DIR$/FPV Camera and maps.iml" />
+      <module fileurl="file://C:\Users\Pearl\Desktop\Media_Manager_Gimbal_Control\FPV Camera and maps.iml" filepath="C:\Users\Pearl\Desktop\Media_Manager_Gimbal_Control\FPV Camera and maps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Media_Manager_Gimbal_Control.iml" filepath="$PROJECT_DIR$/.idea/Media_Manager_Gimbal_Control.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
