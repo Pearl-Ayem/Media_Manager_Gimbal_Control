@@ -2,15 +2,10 @@ package com.dji.FPVDemo;
 
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -22,26 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
-import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
-import dji.sdk.useraccount.UserAccountManager;
 
 public class MainActivity extends Activity implements SurfaceTextureListener, View.OnClickListener{
 
@@ -96,7 +80,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
             }
         };
 
-        Camera camera = FPVDemoApplication.getCameraInstance();
+        Camera camera = DemoApplication.getCameraInstance();
 
         if (camera != null) {
 
@@ -259,7 +243,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
 
     private void initPreviewer() {
 
-        BaseProduct product = FPVDemoApplication.getProductInstance();
+        BaseProduct product = DemoApplication.getProductInstance();
 
         if (product == null || !product.isConnected()) {
             showToast(getString(R.string.disconnected));
@@ -274,7 +258,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     }
 
     private void uninitPreviewer() {
-        Camera camera = FPVDemoApplication.getCameraInstance();
+        Camera camera = DemoApplication.getCameraInstance();
         if (camera != null) {
             // Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
@@ -340,7 +324,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
 
     private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode) {
 
-        Camera camera = FPVDemoApplication.getCameraInstance();
+        Camera camera = DemoApplication.getCameraInstance();
         if (camera != null) {
             camera.setMode(cameraMode, new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -359,7 +343,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     // Method for taking photo
     private void captureAction() {
 
-        final Camera camera = FPVDemoApplication.getCameraInstance();
+        final Camera camera = DemoApplication.getCameraInstance();
         if (camera != null) {
 
             SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
@@ -391,7 +375,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     // Method for starting recording
     private void startRecord() {
 
-        final Camera camera = FPVDemoApplication.getCameraInstance();
+        final Camera camera = DemoApplication.getCameraInstance();
         if (camera != null) {
             camera.startRecordVideo(new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -409,7 +393,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener, Vi
     // Method for stopping recording
     private void stopRecord() {
 
-        Camera camera = FPVDemoApplication.getCameraInstance();
+        Camera camera = DemoApplication.getCameraInstance();
         if (camera != null) {
             camera.stopRecordVideo(new CommonCallbacks.CompletionCallback() {
 

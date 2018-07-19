@@ -19,9 +19,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dji.FPVDemo.FPVDemoApplication;
-import com.dji.FPVDemo.MainActivity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,7 +68,7 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
 
         // Register the broadcast receiver for receiving the device connection's changes.
         IntentFilter filter = new IntentFilter();
-        filter.addAction(FPVDemoApplication.FLAG_CONNECTION_CHANGE);
+        filter.addAction(DemoApplication.FLAG_CONNECTION_CHANGE);
         registerReceiver(mReceiver, filter);
     }
 
@@ -194,7 +191,7 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
     };
 
     private void refreshSDKRelativeUI() {
-        BaseProduct mProduct = FPVDemoApplication.getProductInstance();
+        BaseProduct mProduct = DemoApplication.getProductInstance();
 
         if (null != mProduct && mProduct.isConnected()) {
 
